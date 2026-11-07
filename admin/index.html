@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Base de Conocimientos y Consultas de Alumnos | Admin Asistente Universitario</title>
+    <style>
+        :root {
+            --primary: #417690;
+            --header-bg: #417690;
+            --header-color: #f5dd5d;
+            --breadcrumbs-bg: #79aec8;
+            --module-bg: #79aec8;
+            --link-fg: #447e9b;
+            --body-bg: #f8f9fa;
+            --body-fg: #333333;
+            --card-bg: #ffffff;
+            --border-color: #e2e8f0;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: var(--body-bg);
+            color: var(--body-fg);
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        /* Login Overlay */
+        #login-screen {
+            position: fixed;
+            inset: 0;
+            background: #f0f2f5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+        .login-box {
+            background: #fff;
+            width: 380px;
+            border-radius: 6px;
+            overflow: hidden;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            border: 1px solid #ddd;
+        }
+        .login-header {
+            background: var(--header-bg);
+            color: var(--header-color);
+            padding: 18px 24px;
+            font-size: 18px;
+            font-weight: 600;
+            text-align: center;
+        }
+        .login-body { padding: 24px; }
+        .form-row { margin-bottom: 16px; }
+        .form-row label { display: block; margin-bottom: 6px; font-weight: 600; color: #333; font-size: 13px; }
+        .form-row input {
+            width: 100%;
+            padding: 9px 12px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .login-btn {
+            width: 100%;
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            padding: 10px;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .login-btn:hover { background: #2b5468; }
+        .login-hint {
+            margin-top: 14px;
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            color: #1e40af;
+            padding: 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            text-align: center;
+        }
+
+        /* Header */
+        #header {
+            background: var(--header-bg);
+            color: #fff;
+            padding: 12px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        #branding h1 {
+            color: var(--header-color);
+            font-size: 19px;
+            font-weight: 500;
+        }
+        #user-tools {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        #user-tools a {
+            color: #fff;
+            text-decoration: underline;
+            margin-left: 8px;
+            cursor: pointer;
+        }
+        .breadcrumbs {
+            background: var(--breadcrumbs-bg);
+            color: #fff;
+            padding: 10px 32px;
+            font-size: 13px;
+        }
+        .breadcrumbs a { color: #fff; text-decoration: none; font-weight: 600; }
+
+        /* Flash Message */
+        #flash-msg {
+            display: none;
+            background: #dcfce7;
+            border-bottom: 1px solid #86efac;
+            color: #166534;
+            padding: 12px 32px;
+            font-weight: 600;
+            font-size: 13.5px;
+        }
+
+        /* Main Layout */
+        #content {
+            max-width: 1360px;
+            margin: 24px auto;
+            padding: 0 32px;
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            gap: 28px;
+        }
+        @media (max-width: 900px) {
+            #content { grid-template-columns: 1fr; }
+        }
+        .module {
+            background: var(--card-bg);
+            border: 1px solid #dce1e7;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+        .module caption, .module h2 {
+            background: var(--module-bg);
+            color: #fff;
+            padding: 9px 14px;
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            text-align: left;
+            width: 100%;
+        }
+        .model-list { width: 100%; border-collapse: collapse; }
+        .model-list tr { border-bottom: 1px solid #eee; }
+        .model-list tr:last-child { border-bottom: none; }
+        .model-list tr.active-row { background: #eff6ff; }
+        .model-list td, .model-list th { padding: 10px 14px; text-align: left; font-size: 13.5px; }
+        .model-list a {
+            color: var(--link-fg);
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .model-list a:hover { color: #1d4ed8; text-decoration: underline; }
+        .badge-count {
+            background: #e2e8f0;
+            color: #334155;
+            border-radius: 12px;
+            padding: 2px 8px;
+            font-size: 11.5px;
+            font-weight: 700;
+        }
+
+        /* Content Area */
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .panel-header h2 {
+            font-size: 20px;
+            color: #1e293b;
+            font-weight: 600;
+        }
+        .btn-action {
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 12.5px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .btn-action:hover { background: #2b5468; }
+        .btn-reindex {
+            background: #059669;
+        }
+        .btn-reindex:hover { background: #047857; }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #fff;
+            border: 1px solid #dce1e7;
+        }
+        .data-table th {
+            background: #f1f5f9;
+            color: #475569;
+            font-size: 12px;
+            text-transform: uppercase;
+            padding: 10px 12px;
+            border-bottom: 1px solid #dce1e7;
+            text-align: left;
+        }
+        .data-table td {
+            padding: 11px 12px;
+            border-bottom: 1px solid #f1f5f9;
+            font-size: 13px;
+            vertical-align: top;
+        }
+        .data-table tr:hover { background: #f8fafc; }
+        .status-ok { color: #16a34a; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <!-- Pantalla de Login Django Admin -->
+    <div id="login-screen">
+        <div class="login-box">
+            <div class="login-header">
+                Portal de Administración<br>
+                <span style="font-size:13px; color:#fff; font-weight:400;">Asistente Universitario IA</span>
+            </div>
+            <div class="login-body">
+                <form id="login-form">
+                    <div class="form-row">
+                        <label>Nombre de usuario:</label>
+                        <input type="text" id="username" value="admin" required>
+                    </div>
+                    <div class="form-row">
+                        <label>Contraseña:</label>
+                        <input type="password" id="password" value="admin123" required>
+                    </div>
+                    <button type="submit" class="login-btn">Iniciar sesión</button>
+                    <div class="login-hint">
+                        🔑 Credenciales de demostración pre-cargadas:<br>
+                        Usuario: <strong>admin</strong> | Contraseña: <strong>admin123</strong>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Barra Superior Django Admin -->
+    <header id="header">
+        <div id="branding">
+            <h1>Portal de Administración - Asistente Universitario IA</h1>
+        </div>
+        <div id="user-tools">
+            BIENVENIDO/A, <strong>ADMIN</strong>.
+            <a href="../">VER EL SITIO (PORTAL ESTUDIANTIL)</a> /
+            <a href="../presentacion/">VER PRESENTACIÓN</a> /
+            <a id="logout-link">CERRAR SESIÓN</a>
+        </div>
+    </header>
+
+    <div class="breadcrumbs">
+        <a href="#" onclick="selectModel('faqs'); return false;">Inicio</a> › Base de Conocimientos e IA › <span id="current-breadcrumb">Preguntas y Respuestas (FAQs)</span>
+    </div>
+
+    <div id="flash-msg">✅ Motor de IA / NLP (TF-IDF + Cosine Similarity) reindexado exitosamente en tiempo real.</div>
+
+    <main id="content">
+        <!-- Menú Lateral de Modelos Django -->
+        <aside>
+            <div class="module">
+                <h2>KNOWLEDGE_BASE (BASE DE CONOCIMIENTOS)</h2>
+                <table class="model-list">
+                    <tr id="nav-faqs" class="active-row">
+                        <td><a onclick="selectModel('faqs')">Preguntas y Respuestas (FAQs)</a></td>
+                        <td style="text-align:right;"><span class="badge-count">6</span></td>
+                    </tr>
+                    <tr id="nav-calendar">
+                        <td><a onclick="selectModel('calendar')">Calendario Académico</a></td>
+                        <td style="text-align:right;"><span class="badge-count">6</span></td>
+                    </tr>
+                    <tr id="nav-courses">
+                        <td><a onclick="selectModel('courses')">Horarios de Cursos</a></td>
+                        <td style="text-align:right;"><span class="badge-count">6</span></td>
+                    </tr>
+                    <tr id="nav-procedures">
+                        <td><a onclick="selectModel('procedures')">Trámites Estudiantiles</a></td>
+                        <td style="text-align:right;"><span class="badge-count">3</span></td>
+                    </tr>
+                    <tr id="nav-categories">
+                        <td><a onclick="selectModel('categories')">Categorías</a></td>
+                        <td style="text-align:right;"><span class="badge-count">5</span></td>
+                    </tr>
+                    <tr id="nav-config">
+                        <td><a onclick="selectModel('config')">Configuración del Asistente Virtual</a></td>
+                        <td style="text-align:right;"><span class="badge-count">1</span></td>
+                    </tr>
+                    <tr id="nav-logs">
+                        <td><a onclick="selectModel('logs')">Historial de Mensajes y Sesiones</a></td>
+                        <td style="text-align:right;"><span class="badge-count" id="logs-count">Demo</span></td>
+                    </tr>
+                </table>
+            </div>
+        </aside>
+
+        <!-- Vista de Tabla Activa -->
+        <section>
+            <div class="panel-header">
+                <h2 id="panel-title">Seleccione Pregunta y Respuesta (FAQ) para cambiar</h2>
+                <div style="display:flex; gap:10px;">
+                    <button class="btn-action btn-reindex" onclick="triggerReindex()">⚡ Reindexar Motor de Búsqueda NLP</button>
+                    <a href="../" class="btn-action">🌐 Ir al Chatbot en Vivo</a>
+                </div>
+            </div>
+            <div id="table-container"></div>
+        </section>
+    </main>
+
+    <script>
+        // Manejo de sesión simulada en el navegador
+        const loginScreen = document.getElementById('login-screen');
+        if (sessionStorage.getItem('django_admin_logged') === '1') {
+            loginScreen.style.display = 'none';
+        }
+        document.getElementById('login-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            sessionStorage.setItem('django_admin_logged', '1');
+            loginScreen.style.display = 'none';
+        });
+        document.getElementById('logout-link').addEventListener('click', function() {
+            sessionStorage.removeItem('django_admin_logged');
+            loginScreen.style.display = 'flex';
+        });
+
+        function triggerReindex() {
+            const msg = document.getElementById('flash-msg');
+            msg.style.display = 'block';
+            setTimeout(() => { msg.style.display = 'none'; }, 4000);
+        }
+
+        const MODELS = {
+            faqs: {
+                title: "Seleccione Pregunta y Respuesta (FAQ) para cambiar",
+                breadcrumb: "Preguntas y Respuestas (FAQs)",
+                headers: ["Pregunta Frecuente", "Categoría", "Prioridad", "Consultas", "Activo"],
+                rows: [
+                    ["¿Cuáles son los requisitos para la matrícula del semestre 2026-I?", "📝 Matrículas e Inscripciones", "5", "42", "✅"],
+                    ["¿Dónde y cómo puedo pagar mi pensión y matrícula?", "💳 Pagos y Pensiones", "5", "38", "✅"],
+                    ["¿Cuántos créditos puedo matricular como máximo?", "📝 Matrículas e Inscripciones", "4", "29", "✅"],
+                    ["¿Cómo puedo tramitar el carné universitario?", "📄 Trámites y Certificados", "3", "24", "✅"],
+                    ["¿Cuáles son los horarios de la Biblioteca Central y cómo acceder a los libros virtuales?", "🏛️ Servicios Universitarios", "2", "19", "✅"],
+                    ["¿Qué servicios médicos y de apoyo psicológico ofrece la universidad?", "🏛️ Servicios Universitarios", "2", "15", "✅"]
+                ]
+            },
+            calendar: {
+                title: "Seleccione Fecha de Calendario Académico para cambiar",
+                breadcrumb: "Calendario Académico",
+                headers: ["Título del Evento", "Periodo", "Tipo de Evento", "Fecha de Inicio", "Fecha de Fin", "Activo"],
+                rows: [
+                    ["Matrícula Regular 2026-I", "2026-I", "Matrícula / Inscripciones", "16/02/2026", "27/02/2026", "✅"],
+                    ["Matrícula Extemporánea 2026-I", "2026-I", "Matrícula / Inscripciones", "02/03/2026", "06/03/2026", "✅"],
+                    ["Inicio de Clases Semestre 2026-I", "2026-I", "Inicio / Fin de Clases", "16/03/2026", "16/03/2026", "✅"],
+                    ["Semana de Exámenes Parciales", "2026-I", "Exámenes Parciales / Finales", "04/05/2026", "09/05/2026", "✅"],
+                    ["Plazo Límite para Retiro de Cursos", "2026-I", "Plazo de Trámites", "22/05/2026", "22/05/2026", "✅"],
+                    ["Exámenes Finales y Cierre de Semestre", "2026-I", "Exámenes Parciales / Finales", "06/07/2026", "11/07/2026", "✅"]
+                ]
+            },
+            courses: {
+                title: "Seleccione Horario de Curso para cambiar",
+                breadcrumb: "Horarios de Cursos",
+                headers: ["Código", "Nombre del Curso", "Sección", "Docente a Cargo", "Días y Horarios", "Aula / Lab", "Activo"],
+                rows: [
+                    ["CS-101", "Estructuras de Datos y Algoritmos", "Sección A", "Dr. Carlos Mendoza Ramos", "Lunes y Miércoles 08:00 - 10:00", "Pabellón B - Lab 102", "✅"],
+                    ["CS-101", "Estructuras de Datos y Algoritmos", "Sección B", "Mg. Patricia Vega Salazar", "Martes y Jueves 14:00 - 16:00", "Pabellón B - Lab 104", "✅"],
+                    ["MAT-201", "Cálculo Diferencial e Integral", "Sección A", "Dr. Fernando Ruiz Paredes", "Lunes y Jueves 10:00 - 12:00", "Pabellón A - Aula 201", "✅"],
+                    ["MAT-201", "Cálculo Diferencial e Integral", "Sección B", "Mg. Elena Morales Soto", "Miércoles y Viernes 08:00 - 10:00", "Pabellón A - Aula 204", "✅"],
+                    ["ML-401", "Introducción al Machine Learning", "Sección A", "Dr. Javier Puentes Díaz", "Martes y Viernes 18:00 - 20:00", "Pabellón C - Laboratorio IA", "✅"],
+                    ["DB-301", "Sistemas de Bases de Datos", "Sección A", "Mg. Andrea Torres Luna", "Lunes y Miércoles 16:00 - 18:00", "Pabellón B - Lab 201", "✅"]
+                ]
+            },
+            procedures: {
+                title: "Seleccione Trámite Estudiantil para cambiar",
+                breadcrumb: "Trámites Estudiantiles",
+                headers: ["Nombre del Trámite", "Costo / Tasa", "Tiempo de Atención", "Enlace Portal", "Activo"],
+                rows: [
+                    ["Retiro de Asignatura / Curso", "Gratuito", "48 horas hábiles", "https://intranet.universidad.edu.pe/tramites/retiro", "✅"],
+                    ["Reserva / Suspensión de Matrícula", "S/. 35.00", "3 a 5 días hábiles", "https://intranet.universidad.edu.pe/tramites/reserva", "✅"],
+                    ["Certificado Oficial de Estudios", "S/. 50.00", "5 días hábiles", "https://intranet.universidad.edu.pe/tramites/certificados", "✅"]
+                ]
+            },
+            categories: {
+                title: "Seleccione Categoría para cambiar",
+                breadcrumb: "Categorías",
+                headers: ["Categoría", "Orden", "Descripción"],
+                rows: [
+                    ["📝 Matrículas e Inscripciones", "1", "Todo sobre procesos de matrícula, cronogramas y requisitos."],
+                    ["📚 Cursos y Horarios", "2", "Consultas de asignaturas, secciones, docentes y aulas."],
+                    ["📄 Trámites y Certificados", "3", "Retiros, reservas, certificados de estudios y carnés."],
+                    ["💳 Pagos y Pensiones", "4", "Fechas de cuotas, números de cuenta y métodos de pago."],
+                    ["🏛️ Servicios Universitarios", "5", "Biblioteca, comedor, tópico de salud y orientación psicológica."]
+                ]
+            },
+            config: {
+                title: "Configuración del Asistente Virtual",
+                breadcrumb: "Configuración del Asistente Virtual",
+                headers: ["Nombre del Asistente", "Institución", "Motor de IA Activo", "Umbral de Confianza"],
+                rows: [
+                    ["UniBot Asistente", "Universidad Nacional San Agustín de Demo", "Motor NLP Local (TF-IDF + Cosine Similarity)", "0.15"]
+                ]
+            },
+            logs: {
+                title: "Historial de Mensajes y Consultas de Alumnos",
+                breadcrumb: "Historial de Mensajes",
+                headers: ["Emisor", "Mensaje", "Confianza NLP", "Feedback", "Estado"],
+                rows: [
+                    ["👤 Alumno", "¿Cuándo es la fecha de matrícula 2026-I?", "-", "-", "Registrado"],
+                    ["🤖 Bot", "Matrícula Regular 2026-I: 16/02/2026 hasta el 27/02/2026", "94.2%", "👍 Útil", "Respondido"],
+                    ["👤 Alumno", "¿Cuáles son los horarios de Cálculo?", "-", "-", "Registrado"],
+                    ["🤖 Bot", "Horarios disponibles: Cálculo Diferencial e Integral (MAT-201)...", "91.8%", "👍 Útil", "Respondido"]
+                ]
+            }
+        };
+
+        function selectModel(key) {
+            document.querySelectorAll('.model-list tr').forEach(tr => tr.classList.remove('active-row'));
+            const activeNav = document.getElementById('nav-' + key);
+            if (activeNav) activeNav.classList.add('active-row');
+
+            const m = MODELS[key];
+            document.getElementById('panel-title').innerText = m.title;
+            document.getElementById('current-breadcrumb').innerText = m.breadcrumb;
+
+            let html = '<table class="data-table"><thead><tr>';
+            for (const h of m.headers) {
+                html += `<th>${h}</th>`;
+            }
+            html += '</tr></thead><tbody>';
+            for (const row of m.rows) {
+                html += '<tr>';
+                row.forEach((cell, idx) => {
+                    if (idx === 0) {
+                        html += `<td><strong style="color:#1e40af;">${cell}</strong></td>`;
+                    } else {
+                        html += `<td>${cell}</td>`;
+                    }
+                });
+                html += '</tr>';
+            }
+            html += '</tbody></table>';
+            document.getElementById('table-container').innerHTML = html;
+        }
+
+        selectModel('faqs');
+    </script>
+</body>
+</html>

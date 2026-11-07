@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal del Estudiante | {{ config.university_name }}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1e3a8a;
+            --primary-accent: #2563eb;
+            --bg-body: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            line-height: 1.6;
+        }
+
+        /* Barra de Navegación */
+        header {
+            background: #ffffff;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 14px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: var(--primary);
+        }
+
+        .brand-logo {
+            width: 42px;
+            height: 42px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-accent));
+            color: #ffffff;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            font-weight: 800;
+        }
+
+        .brand-text h1 {
+            font-size: 17px;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+        }
+
+        .brand-text p {
+            font-size: 11px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #334155;
+            font-size: 14px;
+            font-weight: 600;
+            transition: color 0.15s;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary-accent);
+        }
+
+        .admin-link {
+            background: #eff6ff;
+            color: var(--primary-accent) !important;
+            padding: 8px 16px;
+            border-radius: 8px;
+            border: 1px solid #bfdbfe;
+        }
+
+        /* Hero Banner */
+        .hero {
+            background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 50%, #3b82f6 100%);
+            color: #ffffff;
+            padding: 56px 24px;
+            text-align: center;
+        }
+
+        .hero-inner {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .hero-badge {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(8px);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12.5px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .hero h2 {
+            font-size: 34px;
+            font-weight: 800;
+            line-height: 1.25;
+            margin-bottom: 14px;
+        }
+
+        .hero p {
+            font-size: 16px;
+            opacity: 0.9;
+            max-width: 650px;
+            margin: 0 auto 24px;
+        }
+
+        /* Contenedor Principal */
+        .main-container {
+            max-width: 1200px;
+            margin: -32px auto 60px;
+            padding: 0 24px;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .card-icon {
+            width: 40px;
+            height: 40px;
+            background: #eff6ff;
+            color: var(--primary-accent);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .event-item {
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .event-item:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .event-name {
+            font-weight: 600;
+            font-size: 14px;
+            color: #1e293b;
+        }
+
+        .event-date {
+            font-size: 12px;
+            color: var(--primary-accent);
+            font-weight: 700;
+        }
+
+        /* Sección de Integración / Embed Code */
+        .embed-section {
+            background: #0f172a;
+            color: #f8fafc;
+            border-radius: 16px;
+            padding: 32px;
+            margin-top: 32px;
+        }
+
+        .embed-section h3 {
+            font-size: 20px;
+            margin-bottom: 10px;
+            color: #60a5fa;
+        }
+
+        .embed-section p {
+            color: #94a3b8;
+            font-size: 14px;
+            margin-bottom: 16px;
+        }
+
+        .code-box {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            padding: 14px 18px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 13px;
+            color: #38bdf8;
+            overflow-x: auto;
+        }
+
+        footer {
+            text-align: center;
+            padding: 30px;
+            color: var(--text-muted);
+            font-size: 13px;
+            border-top: 1px solid var(--border);
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="nav-container">
+            <a href="/" class="brand">
+                <div class="brand-logo">🎓</div>
+                <div class="brand-text">
+                    <h1>{{ config.university_name }}</h1>
+                    <p>Portal del Estudiante</p>
+                </div>
+            </a>
+            <ul class="nav-links">
+                <li><a href="#fechas">Calendario</a></li>
+                <li><a href="#servicios">Servicios</a></li>
+                <li><a href="#embed">Cómo Embeber</a></li>
+                <li><a href="/admin/" target="_blank" class="admin-link">⚙️ Panel Admin Django</a></li>
+            </ul>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="hero-inner">
+            <div class="hero-badge">✨ Asistente IA 100% Local & Privado</div>
+            <h2>Bienvenido a tu Portal Académico</h2>
+            <p>Consulta tus fechas de matrícula, horarios de cursos, trámites y reglamentos de forma instantánea con nuestro asistente inteligente interactivo.</p>
+        </div>
+    </section>
+
+    <main class="main-container">
+        <div class="grid-3">
+            <!-- Tarjeta 1: Fechas clave -->
+            <div class="card" id="fechas">
+                <div class="card-header">
+                    <div class="card-icon">📅</div>
+                    <div class="card-title">Calendario Académico</div>
+                </div>
+                <div class="events-list">
+                    {% for event in upcoming_events %}
+                    <div class="event-item">
+                        <span class="event-name">{{ event.title }}</span>
+                        <span class="event-date">📌 {{ event.start_date|date:"d M Y" }}{% if event.end_date %} al {{ event.end_date|date:"d M Y" }}{% endif %}</span>
+                    </div>
+                    {% empty %}
+                    <p style="color: #94a3b8; font-size: 13px;">No hay eventos programados.</p>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Tarjeta 2: Servicios -->
+            <div class="card" id="servicios">
+                <div class="card-header">
+                    <div class="card-icon">🏛️</div>
+                    <div class="card-title">Servicios Estudiantiles</div>
+                </div>
+                <ul style="list-style: none; display: flex; flex-direction: column; gap: 12px; font-size: 13.5px;">
+                    <li>📚 <strong>Biblioteca Central:</strong> Lunes a Viernes 08:00 a 20:00</li>
+                    <li>💳 <strong>Módulo de Pensiones:</strong> Pagos vía BCP, BBVA e Interbank</li>
+                    <li>📄 <strong>Mesa de Partes Virtual:</strong> Trámites y constancias en línea</li>
+                    <li>🩺 <strong>Servicio Médico y Psicológico:</strong> Atención presencial pabellón C</li>
+                </ul>
+            </div>
+
+            <!-- Tarjeta 3: Panel Admin -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon">⚙️</div>
+                    <div class="card-title">Administración Django</div>
+                </div>
+                <p style="font-size: 13.5px; color: #475569; margin-bottom: 16px;">
+                    Gestiona en tiempo real las preguntas y respuestas (FAQs), cursos, fechas de matrícula y visualiza las conversaciones y feedback de los alumnos.
+                </p>
+                <a href="/admin/" target="_blank" style="display: block; text-align: center; background: var(--primary); color: #fff; text-decoration: none; padding: 10px; border-radius: 8px; font-weight: 600; font-size: 13.5px;">
+                    Acceder al Panel Admin
+                </a>
+            </div>
+        </div>
+
+        <!-- Instrucciones de Embed -->
+        <div class="embed-section" id="embed">
+            <h3>🚀 ¿Cómo embeber este Asistente en cualquier sitio web?</h3>
+            <p>Solo debes agregar la siguiente etiqueta <code>&lt;script&gt;</code> al final del <code>&lt;body&gt;</code> de cualquier página web de la universidad (HTML, WordPress, React, Moodle, etc.):</p>
+            <div class="code-box">
+                &lt;script src="http://localhost:8000/static/widget/chat-widget.js" defer&gt;&lt;/script&gt;
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>© 2026 {{ config.university_name }} • Sistema de Inteligencia Artificial para Atención Estudiantil</p>
+    </footer>
+
+    <!-- Widget de Chat Embebido -->
+    <script src="/static/widget/chat-widget.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Presentación de Proyecto | Asistente Virtual Universitario con IA</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #090d16;
+            --surface: #111827;
+            --surface-card: #1e293b;
+            --border: #334155;
+            --primary: #3b82f6;
+            --primary-light: #60a5fa;
+            --accent: #10b981;
+            --accent-purple: #8b5cf6;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --gradient-blue: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            --gradient-accent: linear-gradient(135deg, #10b981, #059669);
+            --gradient-title: linear-gradient(135deg, #60a5fa 0%, #a78bfa 50%, #34d399 100%);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+            background-color: var(--bg);
+            color: var(--text-main);
+            overflow: hidden;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            user-select: none;
+        }
+
+        /* Barra Superior */
+        header {
+            height: 60px;
+            padding: 0 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border);
+            background: rgba(17, 24, 39, 0.85);
+            backdrop-filter: blur(12px);
+            z-index: 100;
+        }
+
+        .header-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 700;
+            font-size: 15px;
+            letter-spacing: -0.01em;
+        }
+
+        .badge-tag {
+            background: rgba(59, 130, 246, 0.15);
+            color: var(--primary-light);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .slide-indicator {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            color: var(--text-muted);
+            background: rgba(255, 255, 255, 0.05);
+            padding: 4px 12px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+        }
+
+        /* Contenedor de Diapositivas */
+        .slides-viewport {
+            flex: 1;
+            position: relative;
+            width: 100%;
+            height: calc(100vh - 120px);
+            overflow: hidden;
+        }
+
+        .slide {
+            position: absolute;
+            inset: 0;
+            padding: 48px 64px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            opacity: 0;
+            transform: translateX(60px) scale(0.98);
+            pointer-events: none;
+            transition: all 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+            max-width: 1300px;
+            margin: 0 auto;
+        }
+
+        .slide.active {
+            opacity: 1;
+            transform: translateX(0) scale(1);
+            pointer-events: auto;
+        }
+
+        .slide.previous {
+            transform: translateX(-60px) scale(0.98);
+        }
+
+        /* Tipografía y Elementos de Diapositiva */
+        .slide-subtitle {
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            color: var(--primary-light);
+            font-weight: 700;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .slide-title {
+            font-size: 38px;
+            font-weight: 800;
+            line-height: 1.15;
+            letter-spacing: -0.02em;
+            margin-bottom: 28px;
+        }
+
+        .gradient-text {
+            background: var(--gradient-title);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .slide-content {
+            font-size: 17px;
+            color: #cbd5e1;
+            line-height: 1.6;
+        }
+
+        /* Grillas y Tarjetas */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 28px;
+            align-items: stretch;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+            align-items: stretch;
+        }
+
+        .grid-4 {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+        }
+
+        .card {
+            background: var(--surface-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            transition: transform 0.2s, border-color 0.2s;
+        }
+
+        .card:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        .card-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            background: rgba(59, 130, 246, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            color: var(--primary-light);
+            margin-bottom: 4px;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #f1f5f9;
+        }
+
+        .card-desc {
+            font-size: 14px;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        .card-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            font-size: 14px;
+            color: #cbd5e1;
+        }
+
+        .card-list li {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+        }
+
+        .card-list li::before {
+            content: "✓";
+            color: var(--accent);
+            font-weight: 700;
+        }
+
+        /* Código y Snippets */
+        .code-block {
+            background: #0b0f19;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px 20px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            color: #38bdf8;
+            line-height: 1.6;
+            overflow-x: auto;
+        }
+
+        .code-comment { color: #64748b; }
+        .code-keyword { color: #f472b6; }
+        .code-string { color: #34d399; }
+
+        /* Barra de Navegación Inferior */
+        footer {
+            height: 60px;
+            padding: 0 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-top: 1px solid var(--border);
+            background: rgba(17, 24, 39, 0.85);
+            backdrop-filter: blur(12px);
+            z-index: 100;
+        }
+
+        .nav-btn {
+            background: var(--surface-card);
+            color: var(--text-main);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 8px 18px;
+            font-size: 13.5px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.15s;
+        }
+
+        .nav-btn:hover:not(:disabled) {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: #ffffff;
+        }
+
+        .nav-btn:disabled {
+            opacity: 0.35;
+            cursor: not-allowed;
+        }
+
+        .progress-bar-container {
+            flex: 1;
+            max-width: 400px;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            overflow: hidden;
+            margin: 0 24px;
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 10%;
+            background: var(--gradient-blue);
+            transition: width 0.3s ease;
+        }
+
+        /* Diapositiva 1: Portada */
+        .hero-slide {
+            text-align: center;
+            align-items: center;
+        }
+
+        .hero-slide .slide-title {
+            font-size: 48px;
+            max-width: 950px;
+            margin-bottom: 20px;
+        }
+
+        .hero-slide p {
+            font-size: 19px;
+            max-width: 760px;
+            margin-bottom: 36px;
+            color: #94a3b8;
+        }
+
+        .author-box {
+            display: flex;
+            gap: 24px;
+            background: var(--surface-card);
+            border: 1px solid var(--border);
+            padding: 16px 32px;
+            border-radius: 40px;
+            font-size: 14px;
+        }
+
+        .author-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #cbd5e1;
+        }
+
+        .author-item strong {
+            color: #ffffff;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-brand">
+            <span>🎓 Asistente Virtual Universitario</span>
+            <span class="badge-tag">Machine Learning & NLP</span>
+        </div>
+        <div class="header-controls">
+            <span class="slide-indicator" id="slideNum">1 / 8</span>
+            <button class="nav-btn" onclick="toggleFullscreen()" style="padding: 6px 12px; font-size: 12px;" title="Pantalla Completa (F)">⛶ Pantalla Completa</button>
+        </div>
+    </header>
+
+    <main class="slides-viewport">
+
+        <!-- DIAPOSITIVA 1: Portada -->
+        <section class="slide hero-slide active">
+            <div class="slide-subtitle">🤖 Proyecto de Inteligencia Artificial & Desarrollo Web</div>
+            <h1 class="slide-title">Sistema Inteligente de Atención al Estudiante con <span class="gradient-text">Machine Learning Local</span></h1>
+            <p>Servidor en Django, motor de procesamiento de lenguaje natural (NLP) on-premise y widget de chat embebible para consultas universitarias 24/7.</p>
+            
+            <div class="author-box">
+                <div class="author-item">🏛️ <strong>Institución:</strong> Universidad Privada del Norte (UPN)</div>
+                <div class="author-item">⚙️ <strong>Arquitectura:</strong> Django + Scikit-Learn + Vanilla JS</div>
+                <div class="author-item">💰 <strong>Costo:</strong> $0.00 USD (100% Open Source)</div>
+            </div>
+        </section>
+
+        <!-- DIAPOSITIVA 2: Problemática y Objetivos -->
+        <section class="slide">
+            <div class="slide-subtitle">🎯 Justificación del Proyecto</div>
+            <h2 class="slide-title">Problemática y Objetivos Académicos</h2>
+            
+            <div class="grid-2">
+                <div class="card" style="border-left: 4px solid #ef4444;">
+                    <div class="card-icon" style="background: rgba(239, 68, 68, 0.15); color: #f87171;">⚠️</div>
+                    <div class="card-title">Problemas Detectados en la Atención</div>
+                    <ul class="card-list">
+                        <li><strong>Colapso en matrículas:</strong> Cientos de consultas repetitivas sobre fechas, límites de créditos y turnos.</li>
+                        <li><strong>Horario limitado:</strong> La oficina de asuntos académicos solo atiende en horario de oficina.</li>
+                        <li><strong>Dispersión de información:</strong> Cronogramas, horarios de docentes y trámites en diferentes PDFs y enlaces.</li>
+                    </ul>
+                </div>
+
+                <div class="card" style="border-left: 4px solid #10b981;">
+                    <div class="card-icon" style="background: rgba(16, 185, 129, 0.15); color: #34d399;">🎯</div>
+                    <div class="card-title">Objetivos del Sistema</div>
+                    <ul class="card-list">
+                        <li><strong>Automatización Inmediata:</strong> Respuestas precisas en menos de 100ms mediante NLP.</li>
+                        <li><strong>Gestión Centralizada:</strong> Panel de control administrativo para que el personal actualice información sin programar.</li>
+                        <li><strong>Integración Universal:</strong> Widget embebible en cualquier web de la universidad con una sola línea de código.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- DIAPOSITIVA 3: Arquitectura Técnica -->
+        <section class="slide">
+            <div class="slide-subtitle">🏗️ Diseño de Software</div>
+            <h2 class="slide-title">Arquitectura del Sistema</h2>
+            
+            <div class="grid-3">
+                <div class="card">
+                    <div class="card-icon">🖥️</div>
+                    <div class="card-title">Backend & Admin (Django)</div>
+                    <p class="card-desc">Django 5 + Django REST Framework con CORS habilitado.</p>
+                    <ul class="card-list">
+                        <li>Panel <strong>Django Admin</strong> para gestión de FAQs, cursos y fechas.</li>
+                        <li>Endpoints REST para chat, configuración y feedback.</li>
+                        <li>Persistencia y logs con SQLite / PostgreSQL.</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <div class="card-icon">🧠</div>
+                    <div class="card-title">Motor ML / NLP Local</div>
+                    <p class="card-desc">Procesamiento de texto offline sin costo de APIs externas.</p>
+                    <ul class="card-list">
+                        <li>TF-IDF Vectorizer + N-Grams (1 a 3).</li>
+                        <li>Similitud de Coseno + Boosting por entidades.</li>
+                        <li>Conector extensible a <strong>Ollama (Llama 3.2)</strong>.</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <div class="card-icon">💬</div>
+                    <div class="card-title">Widget JavaScript Embebido</div>
+                    <p class="card-desc">Componente web aislado e integrable en cualquier sitio.</p>
+                    <ul class="card-list">
+                        <li>Desarrollado en <strong>Vanilla JS + Shadow DOM</strong>.</li>
+                        <li>Formateo Markdown automático y tablas interactivas.</li>
+                        <li>Chips dinámicos de sugerencias y feedback 👍/👎.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- DIAPOSITIVA 4: Motor de Machine Learning y NLP -->
+        <section class="slide">
+            <div class="slide-subtitle">🔬 Inteligencia Artificial & NLP</div>
+            <h2 class="slide-title">¿Cómo Funciona el Motor NLP Local?</h2>
+            
+            <div class="grid-2">
+                <div class="card">
+                    <div class="card-icon">⚙️</div>
+                    <div class="card-title">Pipeline de Procesamiento</div>
+                    <ul class="card-list">
+                        <li><strong>Normalización Lingüística:</strong> Eliminación de diacríticos/tildes, caracteres especiales y normalización en minúsculas en español.</li>
+                        <li><strong>Filtrado de Stopwords:</strong> Remoción de palabras vacías no informativas preservando términos clave.</li>
+                        <li><strong>Vectorización TF-IDF Multigramas:</strong> Conversión del corpus universitario y de la consulta del alumno a matrices vectoriales numéricas.</li>
+                        <li><strong>Re-ranking por Entidades:</strong> Bonificación cuando se detectan nombres de cursos, docentes o trámites específicos.</li>
+                    </ul>
+                </div>
+
+                <div class="card" style="background: #0b0f19;">
+                    <div class="card-icon" style="background: rgba(139, 92, 246, 0.15); color: #a78bfa;">💻</div>
+                    <div class="card-title">Cálculo de Similitud Vectorial</div>
+                    <div class="code-block">
+<span class="code-comment"># Vectorización de la pregunta</span>
+query_vec = vectorizer.transform([norm_query])
+
+<span class="code-comment"># Similitud de Coseno con el corpus</span>
+similarities = cosine_similarity(query_vec, tfidf_matrix)
+
+<span class="code-comment"># Ranking con boosting por entidad</span>
+score = tfidf_score * priority + entity_bonus
+                    </div>
+                    <p class="card-desc" style="margin-top: 8px;">Permite tiempos de respuesta de <strong>&lt; 50 ms</strong> sin depender de tarjetas GPU pesadas ni costos de API.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- DIAPOSITIVA 5: Base de Conocimientos y Dominio Universitario -->
+        <section class="slide">
+            <div class="slide-subtitle">📚 Estructura de Datos</div>
+            <h2 class="slide-title">Módulos de la Base de Conocimientos</h2>
+            
+            <div class="grid-4">
+                <div class="card">
+                    <div class="card-icon">📅</div>
+                    <div class="card-title">Calendario</div>
+                    <p class="card-desc">Fechas de matrícula regular, extemporánea, parciales, finales y plazos de retiro.</p>
+                </div>
+
+                <div class="card">
+                    <div class="card-icon">📖</div>
+                    <div class="card-title">Horarios y Cursos</div>
+                    <p class="card-desc">Secciones, códigos de materia, créditos, docentes asignados, aulas y laboratorios.</p>
+                </div>
+
+                <div class="card">
+                    <div class="card-icon">📋</div>
+                    <div class="card-title">Trámites</div>
+                    <p class="card-desc">Retiro de asignatura, reserva de matrícula, certificados oficiales y carnés con costos y pasos.</p>
+                </div>
+
+                <div class="card">
+                    <div class="card-icon">💳</div>
+                    <div class="card-title">Pagos & Servicios</div>
+                    <p class="card-desc">Canales bancarios (BCP, BBVA), biblioteca virtual, seguros y bienestar universitario.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- DIAPOSITIVA 6: Panel de Administración y Monitoreo -->
+        <section class="slide">
+            <div class="slide-subtitle">🛠️ Panel de Gestión</div>
+            <h2 class="slide-title">Administración y Monitoreo en Tiempo Real</h2>
+            
+            <div class="grid-2">
+                <div class="card">
+                    <div class="card-icon">⚡</div>
+                    <div class="card-title">Autonomía para el Personal Académico</div>
+                    <ul class="card-list">
+                        <li><strong>CRUD Completo:</strong> Agregar o modificar preguntas y respuestas sin tocar código ni reiniciar el servidor.</li>
+                        <li><strong>Reindexación en 1 Clic:</strong> Botón de acción en Django Admin para reconstruir la matriz vectorial instantáneamente.</li>
+                        <li><strong>Control de Vigencia:</strong> Activar/desactivar eventos del calendario según el periodo académico en curso.</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <div class="card-icon">📊</div>
+                    <div class="card-title">Auditoría y Retroalimentación</div>
+                    <ul class="card-list">
+                        <li><strong>Historial de Consultas:</strong> Registro de cada mensaje enviado por los estudiantes e IP de conexión.</li>
+                        <li><strong>Score de Confianza ML:</strong> Visualización del porcentaje de certeza con el que el motor respondió.</li>
+                        <li><strong>Feedback de Alumnos:</strong> Registro de valoraciones (👍 Útil / 👎 No útil) para detectar preguntas que requieran mejora.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- DIAPOSITIVA 7: Demostración del Widget Embebido -->
+        <section class="slide">
+            <div class="slide-subtitle">🔌 Integración Frontend</div>
+            <h2 class="slide-title">Integración Rápida con JavaScript</h2>
+            
+            <div class="grid-2">
+                <div class="card">
+                    <div class="card-icon">🛡️</div>
+                    <div class="card-title">Ventajas del Shadow DOM</div>
+                    <p class="card-desc">El widget vive dentro de un Shadow Root aislado del DOM principal:</p>
+                    <ul class="card-list">
+                        <li><strong>Sin colisiones CSS:</strong> Los estilos de la página universitaria o intranet no deforman el chat.</li>
+                        <li><strong>Cero dependencias:</strong> Funciona en Vanilla JS sin requerir React, Vue ni librerías pesadas.</li>
+                        <li><strong>Totalmente Responsive:</strong> Adaptable a smartphones, tablets y pantallas de escritorio.</li>
+                    </ul>
+                </div>
+
+                <div class="card" style="background: #0b0f19;">
+                    <div class="card-icon" style="background: rgba(59, 130, 246, 0.15); color: #60a5fa;">📦</div>
+                    <div class="card-title">Código de Integración (1 sola línea)</div>
+                    <p class="card-desc" style="margin-bottom: 12px;">Cualquier sistema web puede incluir el asistente añadiendo:</p>
+                    <div class="code-block">
+&lt;!-- Widget de Asistente IA --&gt;
+&lt;<span class="code-keyword">script</span> <span class="code-string">src="https://servidor.edu/static/widget/chat-widget.js"</span> <span class="code-keyword">defer</span>&gt;&lt;/<span class="code-keyword">script</span>&gt;
+                    </div>
+                    <p class="card-desc" style="margin-top: 14px;">El script automáticamente genera el botón flotante, la ventana modal y se conecta a la API de Django.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- DIAPOSITIVA 8: Conclusiones y Trabajo Futuro -->
+        <section class="slide">
+            <div class="slide-subtitle">🚀 Conclusiones</div>
+            <h2 class="slide-title">Logros y Trabajo Futuro</h2>
+            
+            <div class="grid-2">
+                <div class="card" style="border-color: #10b981;">
+                    <div class="card-icon" style="background: rgba(16, 185, 129, 0.15); color: #34d399;">🏆</div>
+                    <div class="card-title">Resultados Alcanzados</div>
+                    <ul class="card-list">
+                        <li><strong>Viabilidad 100% Gratuita:</strong> Solución robusta de costo cero ideal para el entorno académico.</li>
+                        <li><strong>Alta Precisión:</strong> Respuestas formateadas en tablas y cronogramas con precisión sobre el 90%.</li>
+                        <li><strong>Fácil Mantenimiento:</strong> Interfaz administrativa lista para su uso por personal no técnico.</li>
+                    </ul>
+                </div>
+
+                <div class="card" style="border-color: #8b5cf6;">
+                    <div class="card-icon" style="background: rgba(139, 92, 246, 0.15); color: #a78bfa;">🔮</div>
+                    <div class="card-title">Siguientes Pasos (Evolución)</div>
+                    <ul class="card-list">
+                        <li><strong>Interacción por Voz (STT/TTS):</strong> Reconocimiento y respuesta de audio para mayor accesibilidad.</li>
+                        <li><strong>Integración con Banner / SIS:</strong> Conexión autenticada para consultar notas y turnos individuales en tiempo real.</li>
+                        <li><strong>Despliegue On-Premise:</strong> Instalación en servidores locales de la facultad con contenedores Docker.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer>
+        <button class="nav-btn" id="prevBtn" onclick="changeSlide(-1)">◀ Anterior</button>
+        
+        <div class="progress-bar-container">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+
+        <button class="nav-btn" id="nextBtn" onclick="changeSlide(1)">Siguiente ▶</button>
+    </footer>
+
+    <script>
+        const slides = document.querySelectorAll('.slide');
+        const slideNumEl = document.getElementById('slideNum');
+        const progressBar = document.getElementById('progressBar');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        
+        let currentSlide = 0;
+        const totalSlides = slides.length;
+
+        function updateSlide() {
+            slides.forEach((slide, index) => {
+                slide.classList.remove('active', 'previous');
+                if (index === currentSlide) {
+                    slide.classList.add('active');
+                } else if (index < currentSlide) {
+                    slide.classList.add('previous');
+                }
+            });
+
+            slideNumEl.textContent = `${currentSlide + 1} / ${totalSlides}`;
+            progressBar.style.width = `${((currentSlide + 1) / totalSlides) * 100}%`;
+
+            prevBtn.disabled = currentSlide === 0;
+            nextBtn.disabled = currentSlide === totalSlides - 1;
+        }
+
+        function changeSlide(direction) {
+            const next = currentSlide + direction;
+            if (next >= 0 && next < totalSlides) {
+                currentSlide = next;
+                updateSlide();
+            }
+        }
+
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => {});
+            } else {
+                document.exitFullscreen().catch(err => {});
+            }
+        }
+
+        // Navegación por teclado
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === 'Space' || e.key === 'PageDown') {
+                e.preventDefault();
+                changeSlide(1);
+            } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+                e.preventDefault();
+                changeSlide(-1);
+            } else if (e.key === 'f' || e.key === 'F') {
+                toggleFullscreen();
+            }
+        });
+
+        // Inicializar
+        updateSlide();
+    </script>
+</body>
+</html>
